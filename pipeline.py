@@ -12,7 +12,7 @@ API_ID = 27889863
 API_HASH = "df4d440af21594b001dc768518140c6b"
 
 # ✅ Persistent session file (avoids repeated phone verification)
-SESSION_FILE = "toi_session"
+SESSION_FILE = "toi_session_feb"
 
 # ✅ Target Telegram Channel
 CHANNEL_USERNAME = "the_times_of_india_0"  # Remove '@' symbol

@@ -37,3 +37,10 @@ cd C:\Users\shafe\automationbot
 python C:\Users\shafe\automationbot\pune.py
 python C:\Users\shafe\automationbot\ext.py
 python C:\Users\shafe\automationbot\pipeline.py
+
+
+telethon
+pdfplumber
+pytesseract
+pillow
+pandas
