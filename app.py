@@ -52,7 +52,7 @@ app = FastAPI(title="Newspaper Extraction API", version="0.1.0", lifespan=lifesp
 # Enable CORS for React frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3002"],  # Add both ports
+    allow_origins=["https://bot-j4pa.onrender.com"],  # Add both ports
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

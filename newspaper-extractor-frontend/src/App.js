@@ -20,7 +20,7 @@ import axios from 'axios';
 import './App.css';
 
 // Update to the EC2 public IP
-const API_BASE_URL = 'http://13.126.32.105:8000';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://13.126.32.105:8000';
 
 function App() {
   const [city, setCity] = useState('');
