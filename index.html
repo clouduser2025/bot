@@ -3,82 +3,362 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Newspaper PDF Extraction</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Newspaper Extraction Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        body {
+            background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460, #1a1a2e);
+            background-size: 400% 400%;
+            animation: gradientBackground 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        @keyframes gradientBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+            padding: 40px;
+            width: 100%;
+            max-width: 1200px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeIn 1s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1 {
+            text-align: center;
+            color: #e0e0e0;
+            font-size: 3em;
+            margin-bottom: 30px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(255, 255, 255, 0.3), 0 0 20px rgba(255, 255, 255, 0.2); }
+            to { text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(255, 255, 255, 0.5); }
+        }
+        .input-group {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            gap: 15px;
+            align-items: center;
+        }
+        input[type="text"] {
+            padding: 15px 25px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 50px;
+            outline: none;
+            width: 60%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        input[type="text"]:focus {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            transform: scale(1.02);
+        }
+        button {
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(45deg, #ff6f61, #de1b5f);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(255, 111, 97, 0.5);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 111, 97, 0.8);
+            background: linear-gradient(45deg, #de1b5f, #ff6f61);
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        #progress-bar {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            height: 30px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+        #progress {
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #ff6f61, #de1b5f);
+            text-align: center;
+            color: #fff;
+            line-height: 30px;
+            transition: width 0.5s ease;
+            border-radius: 20px;
+            font-weight: 600;
+            box-shadow: 0 0 20px rgba(255, 111, 97, 0.7);
+        }
+        #progress-text {
+            font-size: 1.2em;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #e0e0e0;
+            font-weight: 400;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: slideIn 1s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        th, td {
+            padding: 20px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+        }
+        th {
+            background: rgba(255, 111, 97, 0.3);
+            color: #fff;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        tr {
+            transition: background 0.3s ease;
+        }
+        tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .download-buttons {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .download-buttons button {
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .download-buttons #downloadPdfBtn {
+            background: linear-gradient(45deg, #1e90ff, #00b4d8);
+            box-shadow: 0 5px 20px rgba(30, 144, 255, 0.5);
+        }
+        .download-buttons #downloadPdfBtn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(30, 144, 255, 0.8);
+            background: linear-gradient(45deg, #00b4d8, #1e90ff);
+        }
+        .download-buttons #downloadExcelBtn {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            box-shadow: 0 5px 20px rgba(46, 204, 113, 0.5);
+        }
+        .download-buttons #downloadExcelBtn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(46, 204, 113, 0.8);
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+        }
+        @media (max-width: 768px) {
+            .container { padding: 20px; }
+            h1 { font-size: 2.2em; }
+            .input-group { flex-direction: column; align-items: center; gap: 15px; }
+            input[type="text"] { width: 100%; border-radius: 50px; }
+            button { width: 100%; border-radius: 50px; }
+            .download-buttons { flex-direction: column; gap: 15px; }
+        }
+    </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-lg">
-        <h1 class="text-2xl font-bold text-center mb-4 text-gray-800">📜 Newspaper PDF Extractor</h1>
-        
-        <div class="flex items-center space-x-3 mb-4">
-            <input type="text" id="cityInput" placeholder="Enter city name (e.g., Pune)" 
-                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
-            <button onclick="fetchLatestPDF()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                Fetch PDF
-            </button>
+<body>
+    <div class="container">
+        <h1>Newspaper Extraction Tool</h1>
+        <div class="input-group">
+            <input type="text" id="cityInput" placeholder="Enter City (e.g., Pune)" value="Pune">
+            <button onclick="startProcessing()">Extract</button>
         </div>
-
-        <div id="loading" class="hidden text-center text-blue-500 font-semibold">Loading...</div>
-        <div id="pdfLink" class="text-center text-blue-600 mt-2"></div>
-        
-        <div class="mt-4 text-center">
-            <button onclick="extractText()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-                Extract Text
-            </button>
+        <div id="progress-bar">
+            <div id="progress">0%</div>
         </div>
-
-        <div id="extractedText" class="mt-6 p-4 bg-gray-50 rounded-lg shadow-inner hidden"></div>
+        <div id="progress-text">Processing: 0/0 pages</div>
+        <table id="resultsTable">
+            <thead><tr><th>Date</th><th>Page No.</th><th>Keyword</th><th>City</th><th>Extracted Text</th></tr></thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+        <div class="download-buttons">
+            <button id="downloadPdfBtn" onclick="downloadPDF()" disabled>Download Newspaper PDF</button>
+            <button id="downloadExcelBtn" onclick="downloadExcel()" disabled>Download Table as Excel</button>
+        </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
-        async function fetchLatestPDF() {
-            const city = document.getElementById('cityInput').value.trim();
-            if (!city) return alert("Please enter a city name.");
-            
-            document.getElementById('loading').classList.remove('hidden');
-            document.getElementById('pdfLink').innerHTML = "";
+        const { jsPDF } = window.jspdf;
+        let allResults = [];
+        let pdfPath = null;
+        let excelPath = null;
+        let city = null;
+        let date = null;
+        let progressInterval = null;
 
-            const response = await fetch(`https://deven-exij.onrender.com/fetch_latest_pdf/${city}`);
-            document.getElementById('loading').classList.add('hidden');
+        async function startProcessing() {
+            city = document.getElementById('cityInput').value.trim();
+            if (!city) {
+                alert("Please enter a city name.");
+                return;
+            }
 
-            if (response.ok) {
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                document.getElementById('pdfLink').innerHTML = `
-                    <a href="${url}" download="${city}_latest.pdf" class="text-blue-600 underline">⬇️ Download Latest PDF</a>
-                `;
-            } else {
-                alert('No PDF found for the selected city.');
+            document.getElementById('tableBody').innerHTML = '';
+            allResults = [];
+            document.getElementById('downloadPdfBtn').disabled = true;
+            document.getElementById('downloadExcelBtn').disabled = true;
+            const progressBar = document.getElementById('progress-bar');
+            const progress = document.getElementById('progress');
+            const progressText = document.getElementById('progress-text');
+            progressBar.style.display = 'block';
+            progress.style.width = '0%';
+            progress.textContent = '0%';
+            progressText.textContent = 'Processing: 0/0 pages';
+
+            try {
+                const response = await fetch('http://89.116.33.249:8005/process-newspaper/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ city })
+                });
+                const data = await response.json();
+                date = data.date;
+                console.log('Initial response:', data);
+
+                progressInterval = setInterval(async () => {
+                    const progressResponse = await fetch(`http://89.116.33.249:8005/get-progress/${city}/${date}`);
+                    const progressData = await progressResponse.json();
+                    console.log('Progress data:', progressData);
+
+                    if (progressData.status === "processing") {
+                        const { current_page, total_pages } = progressData.progress;
+                        const percentage = total_pages > 0 ? Math.min((current_page / total_pages) * 100, 100) : 0;
+                        progress.style.width = `${percentage}%`;
+                        progress.textContent = `${Math.round(percentage)}%`;
+                        progressText.textContent = `Processing: ${current_page}/${total_pages} pages`;
+                    } else if (progressData.status === "completed") {
+                        clearInterval(progressInterval);
+                        progressBar.style.display = 'none';
+                        progressText.textContent = 'Processing Complete!';
+                        allResults = progressData.extracted_results || [];
+                        pdfPath = progressData.pdf_path;
+                        excelPath = progressData.excel_path;
+                        document.getElementById('downloadPdfBtn').disabled = false;
+                        document.getElementById('downloadExcelBtn').disabled = true; // Disable Excel download for now
+                        updateTable();
+                    }
+                }, 2000); // Poll every 2 seconds
+            } catch (error) {
+                console.error('Fetch error:', error);
+                alert('Failed to start processing: ' + error.message);
             }
         }
 
-        async function extractText() {
-            const city = document.getElementById('cityInput').value.trim();
-            if (!city) return alert("Please enter a city name.");
+        function updateTable() {
+            const tableBody = document.getElementById('tableBody');
+            allResults.forEach(result => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${result["Date"] || 'N/A'}</td>
+                    <td>${result["Page No."] || 'N/A'}</td>
+                    <td>${result["Keyword"] || 'N/A'}</td>
+                    <td>${result["City"] || 'N/A'}</td>
+                    <td>${(result["Extracted Text"] || '').replace(/\n/g, '<br>')}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
 
-            document.getElementById('loading').classList.remove('hidden');
-            document.getElementById('extractedText').classList.add('hidden');
+        async function downloadPDF() {
+            if (!pdfPath || !city) return;
+            try {
+                const response = await fetch(`http://89.116.33.249:8005/download-pdf/${city}/${date}`);
+                if (!response.ok) throw new Error("Failed to download PDF");
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `TOI_${city}_${date}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                alert("Error downloading PDF: " + error.message);
+            }
+        }
 
-            const response = await fetch(`https://deven-exij.onrender.com/extract_text/${city}_latest.pdf`);
-            document.getElementById('loading').classList.add('hidden');
-
-            if (response.ok) {
-                const data = await response.json();
-                const extractedTextContainer = document.getElementById('extractedText');
-                extractedTextContainer.innerHTML = '<h2 class="text-lg font-semibold">Extracted Text</h2>';
-                extractedTextContainer.classList.remove('hidden');
-
-                data.forEach(item => {
-                    extractedTextContainer.innerHTML += `
-                        <div class="p-2 border-b">
-                            <p><strong>📄 Page No.:</strong> ${item['Page No.']}</p>
-                            <p><strong>🔍 Keyword:</strong> ${item['Keyword']}</p>
-                            <p><strong>📝 Extracted Text:</strong> ${item['Extracted Text']}</p>
-                        </div>
-                    `;
-                });
-            } else {
-                alert('Failed to extract text from the PDF.');
+        async function downloadExcel() {
+            if (!excelPath || !city) return;
+            try {
+                const response = await fetch(`http://89.116.33.249:8005/download-excel/${city}/${date}`);
+                if (!response.ok) throw new Error("Failed to download Excel");
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `TOI_${city}_${date}_extracted.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                alert("Error downloading Excel: " + error.message);
             }
         }
     </script>
